@@ -1,6 +1,6 @@
-"use client"
-
+import { useState } from 'react'
 import { GitBranch } from 'lucide-react'
+import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from 'recharts'
 import type { PipelineDonutData } from '@/lib/dashboard/types'
 import { formatCurrencyShort } from '@/lib/currency'
 import { EmptyState } from './empty-state'
@@ -14,6 +14,16 @@ interface PipelineDonutProps {
 }
 
 export function PipelineDonut({ data, loading, currency }: PipelineDonutProps) {
+  const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined)
+
+  const onPieEnter = (_: any, index: number) => {
+    setActiveIndex(index)
+  }
+
+  const onPieLeave = () => {
+    setActiveIndex(undefined)
+  }
+
   return (
     <section className="flex h-full flex-col rounded-xl border border-border bg-card">
       <header className="border-b border-border px-5 py-4">
@@ -34,10 +44,46 @@ export function PipelineDonut({ data, loading, currency }: PipelineDonutProps) {
           />
         ) : (
           <>
-            <Donut data={data} currency={currency} />
+            <div className="flex h-48 items-center justify-center relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data.stages}
+                    dataKey="totalValue"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={88}
+                    stroke="var(--card)"
+                    strokeWidth={2}
+                    activeIndex={activeIndex}
+                    activeShape={renderActiveShape}
+                    onMouseEnter={onPieEnter}
+                    onMouseLeave={onPieLeave}
+                  >
+                    {data.stages.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              {/* Center Label positioned absolutely to avoid custom label renderer complexity during hover */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-[11px] text-muted-foreground">Total</span>
+                <span className="text-[18px] font-semibold tabular-nums text-foreground">
+                  {formatCurrencyShort(data.totalValue, currency)}
+                </span>
+              </div>
+            </div>
             <ul className="mt-5 space-y-2">
-              {data.stages.map((s) => (
-                <li key={s.id} className="flex items-center gap-3 text-xs">
+              {data.stages.map((s, idx) => (
+                <li
+                  key={s.id}
+                  className={`flex items-center gap-3 text-xs p-1.5 rounded-md transition-colors ${activeIndex === idx ? 'bg-muted' : ''}`}
+                  onMouseEnter={() => setActiveIndex(idx)}
+                  onMouseLeave={() => setActiveIndex(undefined)}
+                >
                   <span
                     className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
                     style={{ background: s.color }}
@@ -60,82 +106,19 @@ export function PipelineDonut({ data, loading, currency }: PipelineDonutProps) {
   )
 }
 
-// ------------------------------------------------------------
-// SVG ring. 200×200 viewBox, 12px ring width. We draw one <path>
-// per stage using an SVG arc from startAngle → endAngle. Gaps
-// between segments are implied by a thin slate-900 stroke between
-// them for a cleaner look.
-// ------------------------------------------------------------
-function Donut({ data, currency }: { data: PipelineDonutData; currency: string }) {
-  const size = 200
-  const r = 80
-  const ringWidth = 18
-  const cx = size / 2
-  const cy = size / 2
-
-  // Small slices would render as slivers that disappear into stroke
-  // rounding. We give each stage a floor share purely for rendering,
-  // but keep the labels/legend honest with the actual totals.
-  const totalRaw = data.totalValue || 1
-  const minFrac = 0.02
-  const rawShares = data.stages.map((s) => s.totalValue / totalRaw)
-  const floored = rawShares.map((x) => Math.max(x, minFrac))
-  const floorSum = floored.reduce((a, b) => a + b, 0)
-  const shares = floored.map((x) => x / floorSum)
-
-  // Build a cumulative-offset array, then map stages → arc paths. Using
-  // a pre-computed offsets array avoids the Next 16 React Compiler's
-  // "Cannot reassign variable after render completes" rule.
-  const offsets: number[] = [0]
-  for (let i = 0; i < shares.length; i++) offsets.push(offsets[i] + shares[i])
-  const segments = data.stages.map((s, i) => {
-    const start = offsets[i] * Math.PI * 2 - Math.PI / 2
-    const end = offsets[i + 1] * Math.PI * 2 - Math.PI / 2
-    return { path: arcPath(cx, cy, r, start, end), color: s.color, id: s.id }
-  })
-
+const renderActiveShape = (props: any) => {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props
   return (
-    <div className="flex items-center justify-center">
-      <svg viewBox={`0 0 ${size} ${size}`} className="h-48 w-48" role="img" aria-label="Pipeline value by stage">
-        {/* background ring */}
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--muted)" strokeWidth={ringWidth} />
-        {segments.map((seg) => (
-          <path
-            key={seg.id}
-            d={seg.path}
-            fill="none"
-            stroke={seg.color}
-            strokeWidth={ringWidth}
-            strokeLinecap="butt"
-          />
-        ))}
-        {/* center label */}
-        <text
-          x={cx}
-          y={cy - 6}
-          textAnchor="middle"
-          className="fill-muted-foreground text-[11px]"
-        >
-          Total
-        </text>
-        <text
-          x={cx}
-          y={cy + 14}
-          textAnchor="middle"
-          className="fill-foreground text-[18px] font-semibold tabular-nums"
-        >
-          {formatCurrencyShort(data.totalValue, currency)}
-        </text>
-      </svg>
-    </div>
+    <g>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius - 4}
+        outerRadius={outerRadius + 4}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+      />
+    </g>
   )
-}
-
-function arcPath(cx: number, cy: number, r: number, startRad: number, endRad: number): string {
-  const x1 = cx + r * Math.cos(startRad)
-  const y1 = cy + r * Math.sin(startRad)
-  const x2 = cx + r * Math.cos(endRad)
-  const y2 = cy + r * Math.sin(endRad)
-  const largeArc = endRad - startRad > Math.PI ? 1 : 0
-  return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`
 }

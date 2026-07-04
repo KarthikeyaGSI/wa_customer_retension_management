@@ -10,6 +10,8 @@ export type TemplateSlug =
   | 'out_of_office'
   | 'lead_qualifier'
   | 'follow_up_reminder'
+  | 'vip_lead_routing'
+  | 'support_ticket_handoff'
 
 export interface TemplateStepSeed {
   step_type: AutomationStepType
@@ -33,11 +35,6 @@ export const AUTOMATION_TEMPLATES: Record<TemplateSlug, AutomationTemplateDefini
     slug: 'welcome_message',
     name: 'Welcome Message',
     description: 'Auto-reply to first-time contacts with a greeting.',
-    // first_inbound_message (added in PR #33) catches both brand-new
-    // contacts AND manually-added/imported contacts on their first-ever
-    // reply, which is what a user setting up a "welcome" automation
-    // almost always wants. new_contact_created would miss the
-    // manually-imported case.
     trigger_type: 'first_inbound_message',
     trigger_config: {},
     steps: [
@@ -122,6 +119,77 @@ export const AUTOMATION_TEMPLATES: Record<TemplateSlug, AutomationTemplateDefini
           text:
             "Just circling back — did you have any other questions for us? Happy to help!",
         },
+      },
+    ],
+  },
+  vip_lead_routing: {
+    slug: 'vip_lead_routing',
+    name: 'VIP Lead Routing',
+    description: 'Automatically tag, assign, and notify your team of high-value prospects.',
+    trigger_type: 'keyword_match',
+    trigger_config: {
+      keywords: ['enterprise', 'urgent', 'vip', 'sales'],
+      match_type: 'contains',
+    },
+    steps: [
+      {
+        step_type: 'add_tag',
+        step_config: { tag_id: '' }, // User will fill this in
+      },
+      {
+        step_type: 'assign_conversation',
+        step_config: { mode: 'round_robin' },
+      },
+      {
+        step_type: 'create_deal',
+        step_config: {
+          pipeline_id: '',
+          stage_id: '',
+          title: '{{ contact.name }} - Enterprise Lead',
+          value: 1000,
+        },
+      },
+      {
+        step_type: 'send_message',
+        step_config: {
+          text: "I've flagged this for our VIP sales team. An agent will be right with you!",
+        },
+      },
+      {
+        step_type: 'send_webhook',
+        step_config: {
+          url: '{{organization.defaultWebhook}}',
+          body_template: '{"event": "vip_lead", "contact": "{{ contact.id }}"}',
+        },
+      },
+    ],
+  },
+  support_ticket_handoff: {
+    slug: 'support_ticket_handoff',
+    name: 'Support Ticket Handoff',
+    description: 'Route support requests to agents and create internal notes.',
+    trigger_type: 'keyword_match',
+    trigger_config: {
+      keywords: ['help', 'broken', 'issue', 'bug'],
+      match_type: 'contains',
+    },
+    steps: [
+      {
+        step_type: 'send_message',
+        step_config: {
+          text: "Sorry you're experiencing issues! Could you please provide your account email?",
+        },
+      },
+      {
+        step_type: 'update_contact_field',
+        step_config: {
+          field: 'name', // Safe fallback if they don't have custom fields setup
+          value: '{{ contact.name }} (Needs Support)',
+        },
+      },
+      {
+        step_type: 'assign_conversation',
+        step_config: { mode: 'specific', agent_id: '' }, // Re-assigns to a support rep
       },
     ],
   },
