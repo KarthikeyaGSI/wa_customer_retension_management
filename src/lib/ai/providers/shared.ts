@@ -10,6 +10,8 @@ export interface ProviderArgs {
   systemPrompt: string
   messages: ChatMessage[]
   timeoutMs: number
+  baseUrl?: string | null
+  providerName?: string
 }
 
 /** Map a fetch rejection (timeout / DNS / offline) to a typed AiError. */

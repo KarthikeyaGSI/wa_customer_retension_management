@@ -7,23 +7,39 @@ import {
   type ProviderArgs,
 } from './shared'
 
-const OPENAI_URL = 'https://api.openai.com/v1/chat/completions'
+const DEFAULT_OPENAI_URL = 'https://api.openai.com/v1/chat/completions'
+
+const PROVIDER_URLS: Record<string, string> = {
+  nvidia: 'https://integrate.api.nvidia.com/v1/chat/completions',
+  groq: 'https://api.groq.com/openai/v1/chat/completions',
+  together: 'https://api.together.xyz/v1/chat/completions',
+  deepseek: 'https://api.deepseek.com/chat/completions',
+}
 
 interface OpenAiResponse {
   choices?: { message?: { content?: string } }[]
 }
 
 /**
- * Call OpenAI's Chat Completions endpoint with the caller's own key.
+ * Call OpenAI's Chat Completions endpoint (or compatible) with the caller's own key.
  * Returns the raw assistant text (handoff parsing happens in
  * `generateReply`).
  */
 export async function generateOpenAi(args: ProviderArgs): Promise<string> {
-  const { apiKey, model, systemPrompt, messages, timeoutMs } = args
+  const { apiKey, model, systemPrompt, messages, timeoutMs, baseUrl, providerName } = args
+
+  let endpoint = DEFAULT_OPENAI_URL
+  if (baseUrl) {
+    endpoint = baseUrl.endsWith('/chat/completions')
+      ? baseUrl
+      : `${baseUrl.replace(/\/+$/, '')}/chat/completions`
+  } else if (providerName && PROVIDER_URLS[providerName]) {
+    endpoint = PROVIDER_URLS[providerName]
+  }
 
   let res: Response
   try {
-    res = await fetch(OPENAI_URL, {
+    res = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -35,7 +51,7 @@ export async function generateOpenAi(args: ProviderArgs): Promise<string> {
           { role: 'system', content: systemPrompt },
           ...mergeConsecutive(messages),
         ],
-        max_completion_tokens: MAX_OUTPUT_TOKENS,
+        max_tokens: MAX_OUTPUT_TOKENS, // some providers prefer max_tokens over max_completion_tokens
       }),
       signal: AbortSignal.timeout(timeoutMs),
     })
@@ -44,7 +60,7 @@ export async function generateOpenAi(args: ProviderArgs): Promise<string> {
   }
 
   if (!res.ok) {
-    throw await providerHttpError('OpenAI', res)
+    throw await providerHttpError(providerName || 'OpenAI API', res)
   }
 
   const data = (await res.json().catch(() => null)) as OpenAiResponse | null

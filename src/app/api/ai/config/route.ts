@@ -30,7 +30,7 @@ export async function GET() {
       // `api_key` is selected only to derive `has_key` — it is stripped
       // out below and never returned to the client.
       .select(
-        'provider, model, system_prompt, is_active, auto_reply_enabled, auto_reply_max_per_conversation, api_key, embeddings_api_key',
+        'provider, model, system_prompt, is_active, auto_reply_enabled, auto_reply_max_per_conversation, api_key, embeddings_api_key, base_url',
       )
       .eq('account_id', accountId)
       .maybeSingle()
@@ -78,8 +78,9 @@ export async function POST(request: Request) {
     if (!body || typeof body !== 'object') return bad('Invalid request body')
 
     const provider = body.provider as AiProvider
-    if (provider !== 'openai' && provider !== 'anthropic') {
-      return bad('provider must be "openai" or "anthropic"')
+    const VALID_PROVIDERS: AiProvider[] = ['openai', 'anthropic', 'nvidia', 'groq', 'together', 'deepseek', 'openai_compatible']
+    if (!VALID_PROVIDERS.includes(provider)) {
+      return bad('Invalid provider')
     }
     const model = typeof body.model === 'string' ? body.model.trim() : ''
     if (!model) return bad('model is required')
@@ -96,6 +97,7 @@ export async function POST(request: Request) {
     maxPer = Math.min(20, Math.max(1, Math.floor(maxPer)))
 
     const rawKey = typeof body.api_key === 'string' ? body.api_key.trim() : ''
+    const baseUrl = typeof body.base_url === 'string' ? body.base_url.trim() : null
 
     // Embeddings key (optional, for semantic KB search): a non-empty
     // string sets/replaces it; an explicit null clears it; absent leaves
@@ -109,7 +111,7 @@ export async function POST(request: Request) {
     // Reuse the stored key when the form didn't send a fresh one.
     const { data: existing } = await supabase
       .from('ai_configs')
-      .select('id, provider, model, api_key')
+      .select('id, provider, model, api_key, base_url')
       .eq('account_id', accountId)
       .maybeSingle()
 
@@ -134,7 +136,8 @@ export async function POST(request: Request) {
       !existing ||
       rawKey !== '' ||
       provider !== existing.provider ||
-      model !== existing.model
+      model !== existing.model ||
+      baseUrl !== existing.base_url
 
     if (credentialsChanged) {
       try {
@@ -147,6 +150,7 @@ export async function POST(request: Request) {
           autoReplyEnabled,
           autoReplyMaxPerConversation: maxPer,
           embeddingsApiKey: null,
+          baseUrl,
         })
       } catch (err) {
         if (err instanceof AiError) {
@@ -185,6 +189,7 @@ export async function POST(request: Request) {
       is_active: isActive,
       auto_reply_enabled: autoReplyEnabled,
       auto_reply_max_per_conversation: maxPer,
+      base_url: baseUrl,
     }
     if (rawEmbeddingsKey) {
       shared.embeddings_api_key = encrypt(rawEmbeddingsKey)

@@ -27,12 +27,14 @@ export async function POST(request: Request) {
     }
 
     const provider = body.provider as AiProvider
-    if (provider !== 'openai' && provider !== 'anthropic') {
+    const VALID_PROVIDERS: AiProvider[] = ['openai', 'anthropic', 'nvidia', 'groq', 'together', 'deepseek', 'openai_compatible']
+    if (!VALID_PROVIDERS.includes(provider)) {
       return NextResponse.json(
-        { error: 'provider must be "openai" or "anthropic"' },
+        { error: 'Invalid provider' },
         { status: 400 },
       )
     }
+    const baseUrl = typeof body.base_url === 'string' ? body.base_url.trim() : null
     const model = typeof body.model === 'string' ? body.model.trim() : ''
     if (!model) {
       return NextResponse.json({ error: 'model is required' }, { status: 400 })
@@ -72,6 +74,7 @@ export async function POST(request: Request) {
         autoReplyEnabled: false,
         autoReplyMaxPerConversation: 3,
         embeddingsApiKey: null,
+        baseUrl,
       })
     } catch (err) {
       if (err instanceof AiError) {

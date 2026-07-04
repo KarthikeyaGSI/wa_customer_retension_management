@@ -25,11 +25,18 @@ export async function generateReply(args: GenerateArgs): Promise<GenerateResult>
     systemPrompt,
     messages,
     timeoutMs,
+    baseUrl: config.baseUrl,
+    providerName: config.provider,
   }
 
   let raw: string
   switch (config.provider) {
     case 'openai':
+    case 'nvidia':
+    case 'groq':
+    case 'together':
+    case 'deepseek':
+    case 'openai_compatible':
       raw = await generateOpenAi(providerArgs)
       break
     case 'anthropic':

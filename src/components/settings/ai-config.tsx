@@ -34,11 +34,21 @@ const MASKED_KEY = '••••••••••••••••';
 const PROVIDER_LABEL: Record<AiProvider, string> = {
   openai: 'OpenAI',
   anthropic: 'Anthropic (Claude)',
+  nvidia: 'Nvidia NIM',
+  groq: 'Groq',
+  together: 'Together AI',
+  deepseek: 'DeepSeek',
+  openai_compatible: 'Custom (OpenAI Compatible)',
 };
 
 const KEY_PLACEHOLDER: Record<AiProvider, string> = {
   openai: 'sk-...',
   anthropic: 'sk-ant-...',
+  nvidia: 'nvapi-...',
+  groq: 'gsk_...',
+  together: 'sk-...',
+  deepseek: 'sk-...',
+  openai_compatible: 'sk-...',
 };
 
 export function AiConfig() {
@@ -60,6 +70,7 @@ export function AiConfig() {
   const [embeddingsKey, setEmbeddingsKey] = useState('');
   const [embeddingsKeyEdited, setEmbeddingsKeyEdited] = useState(false);
   const [hasStoredEmbeddingsKey, setHasStoredEmbeddingsKey] = useState(false);
+  const [baseUrl, setBaseUrl] = useState('');
   const [systemPrompt, setSystemPrompt] = useState('');
   const [isActive, setIsActive] = useState(false);
   const [autoReplyEnabled, setAutoReplyEnabled] = useState(false);
@@ -84,6 +95,7 @@ export function AiConfig() {
         setConfigured(true);
         setProvider(data.provider);
         setModel(data.model);
+        setBaseUrl(data.base_url ?? '');
         setSystemPrompt(data.system_prompt ?? '');
         setIsActive(data.is_active);
         setAutoReplyEnabled(data.auto_reply_enabled);
@@ -130,6 +142,7 @@ export function AiConfig() {
     model: model.trim(),
     api_key: keyPayload(),
     embeddings_api_key: embeddingsKeyPayload(),
+    base_url: baseUrl.trim() || null,
     system_prompt: systemPrompt.trim() || null,
     is_active: isActive,
     auto_reply_enabled: autoReplyEnabled,
@@ -146,6 +159,7 @@ export function AiConfig() {
           provider,
           model: model.trim(),
           api_key: keyPayload(),
+          base_url: baseUrl.trim() || null,
         }),
       });
       const data = await res.json();
@@ -260,9 +274,12 @@ export function AiConfig() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="openai">{PROVIDER_LABEL.openai}</SelectItem>
-                    <SelectItem value="anthropic">
-                      {PROVIDER_LABEL.anthropic}
-                    </SelectItem>
+                    <SelectItem value="anthropic">{PROVIDER_LABEL.anthropic}</SelectItem>
+                    <SelectItem value="nvidia">{PROVIDER_LABEL.nvidia}</SelectItem>
+                    <SelectItem value="groq">{PROVIDER_LABEL.groq}</SelectItem>
+                    <SelectItem value="together">{PROVIDER_LABEL.together}</SelectItem>
+                    <SelectItem value="deepseek">{PROVIDER_LABEL.deepseek}</SelectItem>
+                    <SelectItem value="openai_compatible">{PROVIDER_LABEL.openai_compatible}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -278,6 +295,19 @@ export function AiConfig() {
                 />
               </div>
             </div>
+
+            {provider === 'openai_compatible' && (
+              <div className="space-y-2">
+                <Label htmlFor="ai-base-url">Base URL</Label>
+                <Input
+                  id="ai-base-url"
+                  value={baseUrl}
+                  onChange={(e) => setBaseUrl(e.target.value)}
+                  placeholder="e.g. http://localhost:11434/v1 or https://api.together.xyz/v1"
+                  disabled={disabled}
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="ai-key">API key</Label>

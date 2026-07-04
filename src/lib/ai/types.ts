@@ -6,7 +6,14 @@
 // whether the account is on OpenAI or Anthropic.
 // ============================================================
 
-export type AiProvider = 'openai' | 'anthropic'
+export type AiProvider =
+  | 'openai'
+  | 'anthropic'
+  | 'nvidia'
+  | 'groq'
+  | 'together'
+  | 'deepseek'
+  | 'openai_compatible'
 
 /**
  * Account AI setup, decrypted and ready to use. Produced by
@@ -22,9 +29,10 @@ export interface AiConfig {
   autoReplyEnabled: boolean
   autoReplyMaxPerConversation: number
   /** Optional OpenAI-compatible key for embeddings. When set, the
-   *  knowledge base is embedded and semantic retrieval turns on; when
    *  null, retrieval falls back to lexical full-text search. */
   embeddingsApiKey: string | null
+  /** Optional base URL for custom OpenAI-compatible endpoints. */
+  baseUrl?: string | null
 }
 
 /** A single conversation turn in the shape both providers accept. */
