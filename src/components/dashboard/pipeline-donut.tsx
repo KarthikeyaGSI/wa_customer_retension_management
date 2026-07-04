@@ -59,7 +59,6 @@ export function PipelineDonut({ data, loading, currency }: PipelineDonutProps) {
                     strokeWidth={2}
                     // @ts-expect-error Recharts 3.x type mismatch for Pie active props
                     activeIndex={activeIndex}
-                    // @ts-expect-error Recharts 3.x type mismatch for Pie active props
                     activeShape={renderActiveShape}
                     onMouseEnter={onPieEnter}
                     onMouseLeave={onPieLeave}
