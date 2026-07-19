@@ -1,0 +1,14 @@
+
+> marketingko-wa-crm@0.7.0 dev
+> next dev
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.3.30.219:3000
+- Environments: .env.local
+✓ Ready in 707ms
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
+ GET /automations/new 200 in 4.7s (next.js: 2.4s, proxy.ts: 1966ms, application-code: 332ms)
+ GET /api/account/members 200 in 1587ms (next.js: 273ms, proxy.ts: 501ms, application-code: 813ms)
+ GET /api/account/members 200 in 1249ms (next.js: 11ms, proxy.ts: 187ms, application-code: 1051ms)

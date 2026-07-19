@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "jetro": {
+      "command": "C:\\Users\\Student\\.jetro\\runtime\\node-win32-x64.exe",
+      "args": [
+        "C:\\Users\\Student\\.jetro\\mcp-server\\index.js"
+      ],
+      "env": {
+        "JET_WORKSPACE": "c:\\Users\\Student\\Downloads\\wacrm",
+        "JET_API_URL": "https://api.jetro.ai",
+        "PATH": "C:\\Users\\Student\\.jetro\\runtime;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\MATLAB\\R2026a\\runtime\\win64;C:\\Program Files\\MATLAB\\R2026a\\bin;C:\\\\Users\\\\Student\\\\AppData\\\\Local\\\\Blackbox\\\\bin;C:\\Users\\Student\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\MATLAB\\R2026a\\runtime\\win64;C:\\Program Files\\MATLAB\\R2026a\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\PuTTY\\;C:\\Program Files\\MATLAB\\R2026a\\runtime\\win64;C:\\Program Files\\MATLAB\\R2026a\\bin;C:\\Users\\Student\\Downloads\\node-v24.18.0-win-x64\\node-v24.18.0-win-x64;C:\\Users\\Student\\AppData\\Local\\Programs\\Git\\cmd;C:\\Users\\Student\\Downloads\\node-v24.18.0-win-x64\\node-v24.18.0-win-x64;C:\\Users\\Student\\AppData\\Local\\Programs\\Git\\cmd;C:\\Users\\Student\\AppData\\Local\\GitHubDesktop\\bin;C:\\Users\\Student\\AppData\\Local\\Programs\\Ollama;C:\\Users\\Student\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+      }
+    }
+  }
+}
