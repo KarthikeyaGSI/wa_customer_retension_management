@@ -78,29 +78,9 @@ export function checkRateLimitSync(
   };
 }
 
-let callsSinceSweep = 0;
-
-function sweepExpired(now: number) {
-  for (const [k, v] of buckets) {
-    if (v.resetAt <= now) buckets.delete(k);
-  }
-}
-
 // ============================================================
 // Async Redis-backed rate limiter — for production endpoints
 // ============================================================
-
-export interface RateLimitOptions {
-  limit: number;
-  windowMs: number;
-}
-
-export interface RateLimitResult {
-  success: boolean;
-  remaining: number;
-  reset: number;
-  limit: number;
-}
 
 const RATE_LIMIT_SCRIPT = `
 local key = KEYS[1]
@@ -169,12 +149,12 @@ export async function checkRateLimit(
     const sha = await redis.script('LOAD', script);
     const result = await redis.evalsha(sha, 1, key, limit.toString(), windowMs.toString(), Date.now().toString()) as [number, number, number, number];
 
-    const [allowed, remaining, reset, limit] = result;
+    const [allowed, remaining, reset, resultLimit] = result;
     return {
       success: allowed === 1,
       remaining: Math.max(0, remaining),
       reset,
-      limit,
+      limit: resultLimit,
     };
   } catch (err) {
     if (process.env.NODE_ENV !== 'production') {
@@ -208,8 +188,6 @@ function fallbackCheck(
 // ============================================================
 // Rate limit response helper (unchanged)
 // ============================================================
-
-import { NextResponse } from 'next/server';
 
 export function rateLimitResponse(
   result: { success: boolean; remaining: number; reset: number; limit: number },

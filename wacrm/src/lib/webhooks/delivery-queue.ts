@@ -10,7 +10,7 @@
 // ============================================================
 
 import { Queue, Worker, Job, QueueEvents } from 'bullmq';
-import { getRedis } from './redis';
+import { getRedis } from '../redis';
 import type { WebhookEvent } from '@/lib/webhooks/events';
 
 export interface WebhookDeliveryJob {
@@ -222,8 +222,6 @@ async function moveToDLQ(job: Job<WebhookDeliveryJob>, errorMsg: string): Promis
   const dlq = getDLQ();
   await dlq.add('dlq', {
     ...job.data,
-    lastError: errorMsg,
-    failedAt: new Date().toISOString(),
   });
   
   // Also update the original delivery record
@@ -286,7 +284,13 @@ export async function retryFailedDelivery(deliveryId: string): Promise<void> {
   // Check DLQ
   job = await dlq.getJob(deliveryId);
   if (job) {
-    await job.moveToQueue(QUEUE_NAME, true);
+    await queue.add('deliver', job.data, {
+      jobId: job.id,
+      attempts: job.opts.attempts ?? 3,
+      backoff: job.opts.backoff,
+      delay: 0,
+    });
+    await job.remove();
     return;
   }
   
@@ -308,7 +312,6 @@ export async function getDeliveryStatus(deliveryId: string): Promise<{
     return {
       status: state,
       attempts: job.attemptsMade,
-      nextRetryAt: job.opts.nextRetryAt ? new Date(job.opts.nextRetryAt).toISOString() : undefined,
     };
   }
   
