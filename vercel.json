@@ -3,15 +3,15 @@
   "buildCommand": "cd wacrm && npm run build",
   "installCommand": "cd wacrm && npm install",
   "outputDirectory": "wacrm/.next",
-  "framework": null,
+  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/tasks/reminders/cron",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 9 * * *"
     },
     {
       "path": "/api/appointments/reminders/cron",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 10 * * *"
     }
   ]
 }
