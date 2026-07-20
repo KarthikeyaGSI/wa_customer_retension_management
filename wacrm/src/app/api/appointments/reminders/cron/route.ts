@@ -14,6 +14,7 @@ import {
   resolveConversationByPhone,
 } from '@/lib/whatsapp/resolve-conversation';
 import { sendMessageToConversation } from '@/lib/whatsapp/send-message';
+import { dispatchIntegrations } from '@/lib/integrations/notify';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,6 +74,17 @@ async function processReminders(): Promise<number> {
         .from('appointments')
         .update({ reminder_sent_at: new Date().toISOString() })
         .eq('id', appt.id);
+
+      // Mirror the reminder to Slack / email if configured.
+      try {
+        await dispatchIntegrations({
+          accountId: appt.account_id,
+          text: `Appointment reminder sent to ${appt.customer_name || appt.customer_phone}: ${when}`,
+          emailSubject: 'Appointment reminder',
+        });
+      } catch (notifyErr) {
+        console.error('[appointment-reminders] notify failed', notifyErr);
+      }
 
       sent++;
     } catch (err) {

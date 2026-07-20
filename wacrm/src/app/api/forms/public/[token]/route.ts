@@ -18,6 +18,7 @@ import {
   ContactError,
 } from '@/lib/api/v1/contacts';
 import { runAutomationsForTrigger } from '@/lib/automations/engine';
+import { dispatchIntegrations } from '@/lib/integrations/notify';
 import type { Form, FormField } from '@/types';
 
 export async function GET(
@@ -191,6 +192,19 @@ export async function POST(
       } catch (err) {
         console.error('[POST /api/forms/[token]] automation', err);
       }
+    }
+
+    // Notify configured integrations (Slack / email) about the new lead.
+    try {
+      const who = name ?? email ?? phone ?? 'new contact';
+      await dispatchIntegrations({
+        accountId: form.account_id,
+        text: `New form submission on "${form.title}": ${who}`,
+        emailSubject: `New lead: ${form.title}`,
+        emailTo: email ?? undefined,
+      });
+    } catch (err) {
+      console.error('[POST /api/forms/[token]] integrations', err);
     }
 
     return NextResponse.json(
