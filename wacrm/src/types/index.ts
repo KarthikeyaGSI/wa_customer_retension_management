@@ -567,3 +567,28 @@ export interface AutomationLog {
   created_at: string;
   contact?: Contact;
 }
+
+// ============================================================
+// Tasks (044_tasks.sql)
+// ============================================================
+
+export type TaskStatus = 'todo' | 'in_progress' | 'done' | 'cancelled';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+export interface Task {
+  id: string;
+  account_id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignee_id: string | null;
+  contact_id: string | null;
+  deal_id: string | null;
+  due_at: string | null;
+  completed_at: string | null;
+  remind_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
