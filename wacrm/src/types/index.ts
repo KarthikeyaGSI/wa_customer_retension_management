@@ -645,3 +645,50 @@ export interface Appointment {
   created_at: string;
   updated_at: string;
 }
+
+// ============================================================
+// Intake Forms & Customer Portal (047_forms_portal.sql)
+// ============================================================
+
+export interface FormField {
+  name: string;
+  label: string;
+  type: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'number';
+  required?: boolean;
+  options?: string[];
+}
+
+export interface Form {
+  id: string;
+  account_id: string;
+  token: string;
+  title: string;
+  description: string | null;
+  fields: FormField[];
+  pipeline_id: string | null;
+  stage_id: string | null;
+  trigger_automations: boolean;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FormSubmission {
+  id: string;
+  account_id: string;
+  form_id: string;
+  contact_id: string | null;
+  data: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface PortalLink {
+  id: string;
+  account_id: string;
+  token: string;
+  contact_id: string;
+  title: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}

@@ -13,6 +13,7 @@ import {
   CheckSquare,
   CalendarDays,
   Crown,
+  FileText,
   GitBranch,
   LayoutDashboard,
   LogOut,
@@ -103,6 +104,7 @@ const navItems: NavItem[] = [
   { href: "/agents", label: "AI Agents", icon: Bot },
   { href: "/tasks", label: "Tasks", icon: CheckSquare },
   { href: "/appointments", label: "Appointments", icon: CalendarDays },
+  { href: "/forms", label: "Forms", icon: FileText },
 ];
 
 const bottomNavItems = [
