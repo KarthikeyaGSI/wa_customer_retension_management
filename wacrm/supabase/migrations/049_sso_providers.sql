@@ -58,4 +58,4 @@ CREATE POLICY sso_providers_delete ON sso_providers FOR DELETE
 DROP TRIGGER IF EXISTS sso_providers_set_updated_at ON sso_providers;
 CREATE TRIGGER sso_providers_set_updated_at
   BEFORE UPDATE ON sso_providers
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

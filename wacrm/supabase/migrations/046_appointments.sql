@@ -144,14 +144,14 @@ CREATE POLICY appointments_delete ON appointments FOR DELETE
 DROP TRIGGER IF EXISTS booking_links_set_updated_at ON booking_links;
 CREATE TRIGGER booking_links_set_updated_at
   BEFORE UPDATE ON booking_links
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 DROP TRIGGER IF EXISTS appointment_availability_set_updated_at ON appointment_availability;
 CREATE TRIGGER appointment_availability_set_updated_at
   BEFORE UPDATE ON appointment_availability
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 DROP TRIGGER IF EXISTS appointments_set_updated_at ON appointments;
 CREATE TRIGGER appointments_set_updated_at
   BEFORE UPDATE ON appointments
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

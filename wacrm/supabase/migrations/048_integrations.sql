@@ -52,4 +52,4 @@ CREATE POLICY integrations_config_delete ON integrations_config FOR DELETE
 DROP TRIGGER IF EXISTS integrations_config_set_updated_at ON integrations_config;
 CREATE TRIGGER integrations_config_set_updated_at
   BEFORE UPDATE ON integrations_config
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

@@ -62,4 +62,4 @@ DROP TRIGGER IF EXISTS tasks_set_updated_at ON tasks;
 CREATE TRIGGER tasks_set_updated_at
   BEFORE UPDATE ON tasks
   FOR EACH ROW
-  EXECUTE FUNCTION set_updated_at();
+  EXECUTE FUNCTION update_updated_at_column();

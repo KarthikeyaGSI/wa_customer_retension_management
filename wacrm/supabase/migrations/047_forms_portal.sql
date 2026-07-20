@@ -118,8 +118,8 @@ CREATE POLICY portal_links_delete ON portal_links FOR DELETE
 -- Keep updated_at fresh.
 DROP TRIGGER IF EXISTS forms_set_updated_at ON forms;
 CREATE TRIGGER forms_set_updated_at
-  BEFORE UPDATE ON forms FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  BEFORE UPDATE ON forms FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 DROP TRIGGER IF EXISTS portal_links_set_updated_at ON portal_links;
 CREATE TRIGGER portal_links_set_updated_at
-  BEFORE UPDATE ON portal_links FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  BEFORE UPDATE ON portal_links FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
