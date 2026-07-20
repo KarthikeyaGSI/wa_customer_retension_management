@@ -32,7 +32,6 @@ export async function GET(
 
   const cookieName = `sso_${id}`;
   const stored = req.cookies.get(cookieName)?.value;
-  const res = NextResponse.redirect(`${origin}/dashboard`);
 
   if (errorParam) {
     return NextResponse.redirect(`${origin}/login?sso_error=idp_denied`);

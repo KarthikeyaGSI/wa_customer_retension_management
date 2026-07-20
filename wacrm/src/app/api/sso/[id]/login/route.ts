@@ -29,7 +29,7 @@ export async function GET(
   let disco;
   try {
     disco = await discover(provider.issuer);
-  } catch (e) {
+  } catch {
     return NextResponse.redirect(`${origin}/login?sso_error=discovery_failed`);
   }
 

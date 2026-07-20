@@ -4,7 +4,7 @@ import { encrypt } from '@/lib/whatsapp/encryption';
 
 export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const ctx = await requireRole('viewer');
     const { data, error } = await ctx.supabase

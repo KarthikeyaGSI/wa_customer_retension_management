@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { Loader2, ShieldCheck, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { canEditSettings } from "@/lib/auth/roles";
 import { Button } from "@/components/ui/button";
