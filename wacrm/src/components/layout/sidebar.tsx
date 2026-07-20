@@ -11,6 +11,7 @@ import {
   Bell,
   Bot,
   CheckSquare,
+  CalendarDays,
   Crown,
   GitBranch,
   LayoutDashboard,
@@ -101,6 +102,7 @@ const navItems: NavItem[] = [
   { href: "/flows", label: "Flows", icon: Workflow, beta: true },
   { href: "/agents", label: "AI Agents", icon: Bot },
   { href: "/tasks", label: "Tasks", icon: CheckSquare },
+  { href: "/appointments", label: "Appointments", icon: CalendarDays },
 ];
 
 const bottomNavItems = [

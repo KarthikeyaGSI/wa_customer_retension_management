@@ -8,6 +8,10 @@
     {
       "path": "/wacrm/api/tasks/reminders/cron",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/wacrm/api/appointments/reminders/cron",
+      "schedule": "*/30 * * * *"
     }
   ]
 }

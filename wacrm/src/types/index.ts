@@ -592,3 +592,56 @@ export interface Task {
   created_at: string;
   updated_at: string;
 }
+
+// ============================================================
+// Appointments / Booking (046_appointments.sql)
+// ============================================================
+
+export type AppointmentStatus =
+  | 'confirmed'
+  | 'completed'
+  | 'cancelled'
+  | 'no_show';
+
+export interface BookingLink {
+  id: string;
+  account_id: string;
+  token: string;
+  title: string;
+  description: string | null;
+  contact_id: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AppointmentAvailability {
+  id: string;
+  account_id: string;
+  day_of_week: number;
+  start_minutes: number;
+  end_minutes: number;
+  slot_minutes: number;
+  timezone: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Appointment {
+  id: string;
+  account_id: string;
+  booking_link_id: string | null;
+  booking_token: string;
+  contact_id: string | null;
+  deal_id: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  scheduled_at: string;
+  duration_minutes: number;
+  status: AppointmentStatus;
+  notes: string | null;
+  reminder_sent_at: string | null;
+  whatsapp_msg_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
