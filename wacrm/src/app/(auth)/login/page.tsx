@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -14,7 +14,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MessageSquare, UsersRound } from "lucide-react";
+import { MessageSquare, UsersRound, ShieldCheck } from "lucide-react";
+
+interface SsoButton {
+  id: string;
+  name: string;
+}
 
 // `useSearchParams` opts the component out of static prerendering
 // unless it sits under a Suspense boundary. We split the form into
@@ -40,8 +45,22 @@ function LoginPageInner() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [ssoProviders, setSsoProviders] = useState<SsoButton[]>([]);
+  const [ssoError, setSsoError] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    fetch("/api/sso/providers/public", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((b) => setSsoProviders(b.providers ?? []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const ssoErrorParam = searchParams.get("sso_error");
+    if (ssoErrorParam) setSsoError("SSO sign-in failed. Please try again.");
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +106,31 @@ function LoginPageInner() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {ssoProviders.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {ssoError && (
+                <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  {ssoError}
+                </div>
+              )}
+              {ssoProviders.map((p) => (
+                <a
+                  key={p.id}
+                  href={`/api/sso/${p.id}/login`}
+                  className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-border bg-muted text-sm font-medium text-foreground hover:bg-accent"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                  Continue with {p.name}
+                </a>
+              ))}
+              <div className="my-2 flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                or
+                <span className="h-px flex-1 bg-border" />
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             {error && (
               <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">

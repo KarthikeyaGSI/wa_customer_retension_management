@@ -6,6 +6,7 @@ import {
   Palette,
   PlugZap,
   Shield,
+  ShieldCheck,
   Tags,
   User,
   UsersRound,
@@ -32,6 +33,7 @@ export const SETTINGS_SECTIONS = [
   'members',
   'api',
   'integrations',
+  'sso',
 ] as const;
 
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number];
@@ -58,6 +60,7 @@ export const SECTION_META: Record<SettingsSection, SectionMeta> = {
   members: { id: 'members', label: 'Team members', icon: UsersRound, group: 'workspace' },
   api: { id: 'api', label: 'API keys', icon: KeyRound, group: 'workspace' },
   integrations: { id: 'integrations', label: 'Integrations', icon: PlugZap, group: 'workspace' },
+  sso: { id: 'sso', label: 'Single sign-on', icon: ShieldCheck, group: 'workspace' },
 };
 
 export const RAIL_GROUPS: { label: string | null; group: SectionMeta['group'] }[] = [
